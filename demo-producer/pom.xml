@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.produbanco</groupId>
-    <artifactId>kafka-logs</artifactId>
+    <groupId>com.redhat.workshop</groupId>
+    <artifactId>kafka-audit</artifactId>
     <version>1.0.0</version>
   </parent>
-  <artifactId>kafka-logs-demo-producer</artifactId>
+  <artifactId>kafka-audit-demo-producer</artifactId>
 
   <!-- Generador de DATOS FICTICIOS para validar el flujo. Artefacto aparte a propósito: su código no debe existir en la imagen de producción. -->
   <dependencies>
-    <dependency><groupId>com.produbanco</groupId><artifactId>kafka-logs-core</artifactId></dependency>
+    <dependency><groupId>com.redhat.workshop</groupId><artifactId>kafka-audit-core</artifactId></dependency>
     <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-arc</artifactId></dependency>
     <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-kafka-client</artifactId></dependency>
     <!-- ManagedExecutor: hilos gestionados por el runtime, que sí participan del shutdown. -->

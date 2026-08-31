@@ -1,4 +1,4 @@
-# CI de kafka-logs-demo-producer disparado por Pipelines as Code (PAC).
+# CI de kafka-audit-demo-producer disparado por Pipelines as Code (PAC).
 #
 # Generador de DATOS FICTICIOS: artefacto aparte para que su codigo no viaje en la imagen de produccion.
 #
@@ -11,7 +11,7 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: ci-kafka-logs-demo-producer
+  name: ci-kafka-audit-demo-producer
   annotations:
     pipelinesascode.tekton.dev/on-event: "[push, pull_request]"
     pipelinesascode.tekton.dev/on-target-branch: "[main, develop, release/*]"
@@ -40,9 +40,9 @@ spec:
       value: java
     # Registro destino: la organizacion de DEV, la unica donde el CI puede publicar.
     - name: image-repository
-      value: company-quay-quay-quay-enterprise.apps.ocp.hq2ss.sandbox3270.opentlc.com/company-dev/kafka-logs-demo-producer
+      value: company-quay-quay-quay-enterprise.apps.ocp.hq2ss.sandbox3270.opentlc.com/company-dev/kafka-audit-demo-producer
     - name: image-name
-      value: kafka-logs-demo-producer
+      value: kafka-audit-demo-producer
     # Cada modulo tiene su propio Containerfile: de ahi salen dos imagenes distintas del mismo repo.
     - name: containerfile
       value: ./demo-producer/Dockerfile

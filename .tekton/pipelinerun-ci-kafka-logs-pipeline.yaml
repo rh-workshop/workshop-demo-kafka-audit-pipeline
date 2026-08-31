@@ -1,4 +1,4 @@
-# CI de kafka-logs-pipeline disparado por Pipelines as Code (PAC).
+# CI de kafka-audit-pipeline disparado por Pipelines as Code (PAC).
 #
 # Imagen de PRODUCCION: solo los roles processor y sink.
 #
@@ -11,7 +11,7 @@
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
-  name: ci-kafka-logs-pipeline
+  name: ci-kafka-audit-pipeline
   annotations:
     pipelinesascode.tekton.dev/on-event: "[push, pull_request]"
     pipelinesascode.tekton.dev/on-target-branch: "[main, develop, release/*]"
@@ -40,9 +40,9 @@ spec:
       value: java
     # Registro destino: la organizacion de DEV, la unica donde el CI puede publicar.
     - name: image-repository
-      value: company-quay-quay-quay-enterprise.apps.ocp.hq2ss.sandbox3270.opentlc.com/company-dev/kafka-logs-pipeline
+      value: company-quay-quay-quay-enterprise.apps.ocp.hq2ss.sandbox3270.opentlc.com/company-dev/kafka-audit-pipeline
     - name: image-name
-      value: kafka-logs-pipeline
+      value: kafka-audit-pipeline
     # Cada modulo tiene su propio Containerfile: de ahi salen dos imagenes distintas del mismo repo.
     - name: containerfile
       value: ./pipeline/Dockerfile
