@@ -1,0 +1,13 @@
+# Configuración del escáner de secretos.
+#
+# Se hereda el conjunto de reglas por defecto y solo se añade una excepción: el vector de prueba
+# que congela la interoperabilidad criptográfica entre este servicio y el productor .NET.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = """Vector de prueba de la derivación de llave, no una credencial: la cadena decodifica \
+a 'produbanco-lab-aes-256-key-00001' y existe para que Java y .NET congelen el mismo resultado de \
+HKDF. Sin él no se puede detectar una divergencia del contrato entre ambos lenguajes."""
+paths = ['''.*src/test/java/com/produbanco/logs/crypto/.*Test\.java''']
+regexes = ['''cHJvZHViYW5jby1sYWItYWVzLTI1Ni1rZXktMDAwMDE=''']
