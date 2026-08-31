@@ -14,7 +14,7 @@ import org.jboss.logging.Logger;
 import com.produbanco.logs.codec.Compression;
 import com.produbanco.logs.config.PipelineConfig;
 import com.produbanco.logs.crypto.Crypto;
-import com.produbanco.logs.demo.AuditEventFactory;
+import com.produbanco.logs.demo.DummyEventFactory;
 import com.produbanco.logs.domain.AuditEvent;
 import com.produbanco.logs.kafka.KafkaClientFactory;
 import com.produbanco.logs.kafka.Topics;
@@ -28,9 +28,9 @@ import jakarta.inject.Inject;
 /// En producción esto lo hace la librería .NET; aquí existe para poder validar el flujo completo
 /// sin depender de los microservicios del cliente.
 @ApplicationScoped
-public class ProducerRunner implements RoleRunner {
+public class DummyDataRunner implements RoleRunner {
 
-    private static final Logger LOG = Logger.getLogger(ProducerRunner.class);
+    private static final Logger LOG = Logger.getLogger(DummyDataRunner.class);
 
     private final KafkaClientFactory clients;
     private final PipelineConfig config;
@@ -45,7 +45,7 @@ public class ProducerRunner implements RoleRunner {
     private volatile KafkaProducer<String, String> producer;
 
     @Inject
-    public ProducerRunner(KafkaClientFactory clients, PipelineConfig config, Crypto crypto) {
+    public DummyDataRunner(KafkaClientFactory clients, PipelineConfig config, Crypto crypto) {
         this.clients = clients;
         this.config = config;
         this.crypto = crypto;
@@ -54,7 +54,7 @@ public class ProducerRunner implements RoleRunner {
     @Override
     public void run() {
         producer = clients.encryptedProducer();
-        var events = new AuditEventFactory(
+        var events = new DummyEventFactory(
                 config.producer().environment(),
                 config.producer().payloadBytes());
         int rateMs = config.producer().rateMs();

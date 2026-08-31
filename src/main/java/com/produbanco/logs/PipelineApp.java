@@ -6,7 +6,7 @@ import org.jboss.logging.Logger;
 import com.produbanco.logs.config.PipelineConfig;
 import com.produbanco.logs.health.RoleState;
 import com.produbanco.logs.role.ProcessorRunner;
-import com.produbanco.logs.role.ProducerRunner;
+import com.produbanco.logs.role.DummyDataRunner;
 import com.produbanco.logs.role.Role;
 import com.produbanco.logs.role.RoleRunner;
 import com.produbanco.logs.role.SinkRunner;
@@ -35,7 +35,7 @@ public class PipelineApp {
 
     /// `Instance` y no el bean directo: solo se materializa el rol de esta instancia, así el
     /// productor no construye un consumidor (ni al revés) solo por estar en el mismo binario.
-    private final Instance<ProducerRunner> producer;
+    private final Instance<DummyDataRunner> dummyData;
     private final Instance<ProcessorRunner> processor;
     private final Instance<SinkRunner> sink;
 
@@ -43,12 +43,12 @@ public class PipelineApp {
 
     @Inject
     public PipelineApp(PipelineConfig config, ManagedExecutor executor, RoleState state,
-                       Instance<ProducerRunner> producer, Instance<ProcessorRunner> processor,
+                       Instance<DummyDataRunner> dummyData, Instance<ProcessorRunner> processor,
                        Instance<SinkRunner> sink) {
         this.config = config;
         this.executor = executor;
         this.state = state;
-        this.producer = producer;
+        this.dummyData = dummyData;
         this.processor = processor;
         this.sink = sink;
     }
@@ -56,7 +56,7 @@ public class PipelineApp {
     void onStart(@Observes StartupEvent event) {
         Role role = Role.from(config.role());
         runner = switch (role) {
-            case PRODUCER -> producer.get();
+            case DUMMY_DATA -> dummyData.get();
             case PROCESSOR -> processor.get();
             case SINK -> sink.get();
         };

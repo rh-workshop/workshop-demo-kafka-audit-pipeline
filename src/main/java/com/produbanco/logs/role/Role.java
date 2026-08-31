@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 /// Rol que asume la instancia. Un mismo binario sirve para los tres despliegues.
 public enum Role {
 
-    PRODUCER,
+    /// Emite eventos con DATOS FICTICIOS para validar el flujo; nunca debe correr en producción,
+    /// donde publican los microservicios que integran el paquete .NET.
+    DUMMY_DATA,
     PROCESSOR,
     SINK;
 

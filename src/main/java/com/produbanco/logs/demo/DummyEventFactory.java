@@ -9,7 +9,7 @@ import com.produbanco.logs.domain.AuditEvent;
 ///
 /// Está aislado en su propio paquete para que quede claro qué código es de demostración: los datos
 /// son inventados, nunca de cliente.
-public final class AuditEventFactory {
+public final class DummyEventFactory {
 
     private static final String[] CUSTOMERS =
             {"juan.perez", "maria.gomez", "carlos.ruiz", "ana.torres", "luis.vaca"};
@@ -36,7 +36,7 @@ public final class AuditEventFactory {
     private final int payloadBytes;
     private long sequence;
 
-    public AuditEventFactory(String environment, int payloadBytes) {
+    public DummyEventFactory(String environment, int payloadBytes) {
         this.environment = environment;
         this.payloadBytes = payloadBytes;
     }
