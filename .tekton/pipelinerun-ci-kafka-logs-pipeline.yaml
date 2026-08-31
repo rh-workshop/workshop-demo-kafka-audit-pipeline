@@ -1,0 +1,69 @@
+# CI de kafka-logs-pipeline disparado por Pipelines as Code (PAC).
+#
+# Imagen de PRODUCCION: solo los roles processor y sink.
+#
+# QUE HACE ESTE FICHERO AQUI. El equipo de la APLICACION decide QUE se ejecuta (este PipelineRun:
+# su modulo, su lenguaje, su imagen destino); la PLATAFORMA gobierna CON QUE (el Pipeline y las
+# Tasks, en workshop-demo-platform-config) y CON QUE PERMISOS (el ServiceAccount 'builder').
+#
+# COMO SE DISPARA. PAC observa este repositorio (CR Repository declarado en la plataforma) y ante un
+# evento de Git ejecuta los PipelineRun de .tekton/ en el namespace donde vive ese Repository.
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: ci-kafka-logs-pipeline
+  annotations:
+    pipelinesascode.tekton.dev/on-event: "[push, pull_request]"
+    pipelinesascode.tekton.dev/on-target-branch: "[main, develop, release/*]"
+    pipelinesascode.tekton.dev/max-keep-runs: "10"
+spec:
+  pipelineRef:
+    # Resolver 'cluster': el Pipeline lo despliega Argo desde el repo de plataforma, no vive aqui.
+    resolver: cluster
+    params:
+      - {name: kind, value: pipeline}
+      - {name: name, value: ci-build-image}
+      - {name: namespace, value: workshop-demo-dev}
+  taskRunTemplate:
+    serviceAccountName: builder
+  timeouts:
+    pipeline: 1h0m0s
+  params:
+    # PAC sustituye estas variables con los datos reales del evento de Git.
+    - name: revision
+      value: "{{revision}}"
+    - name: app-repo
+      value: "{{repo_url}}"
+    - name: config-repo
+      value: https://github.com/rh-workshop/workshop-demo-kafka-audit-pipeline-config.git
+    - name: language
+      value: java
+    # Registro destino: la organizacion de DEV, la unica donde el CI puede publicar.
+    - name: image-repository
+      value: company-quay-quay-quay-enterprise.apps.ocp.hq2ss.sandbox3270.opentlc.com/company-dev/kafka-logs-pipeline
+    - name: image-name
+      value: kafka-logs-pipeline
+    # Cada modulo tiene su propio Containerfile: de ahi salen dos imagenes distintas del mismo repo.
+    - name: containerfile
+      value: ./pipeline/Dockerfile
+    - name: overlay-path
+      value: overlays/dev
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources: { requests: { storage: 3Gi } }
+    - name: config
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources: { requests: { storage: 1Gi } }
+    - name: git-credentials
+      secret: { secretName: git-credentials }
+    - name: registry-credentials
+      secret: { secretName: quay-push-credentials }
+    - name: signing-key
+      secret: { secretName: cosign-signing-key }
+    - name: acs-credentials
+      secret: { secretName: acs-pipeline-credentials }
