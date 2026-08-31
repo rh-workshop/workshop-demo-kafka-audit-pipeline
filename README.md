@@ -1,39 +1,56 @@
 # workshop-demo-kafka-audit-pipeline
 
-Servicios del pipeline de logs de auditoría sobre Kafka. Un solo artefacto Java
-(Quarkus) que asume **tres roles** según la variable de entorno `ROLE`.
+Servicios del pipeline de logs de auditoría sobre Kafka (Java / Quarkus).
 
-| Rol | Qué hace |
-|---|---|
-| `processor` | Descifra, valida el esquema OTLP y **enmascara los datos personales** antes de republicar |
-| `sink` | Consume el tópico ya enmascarado y lo entrega al destino final |
-| `producer` | Emisor de referencia para validar el flujo; en producción quien publica es el paquete .NET |
+## Tres módulos, dos imágenes
 
-## Por qué un solo artefacto
+```
+kafka-logs/           (parent)
+├── core/             cifrado, compresión, clientes de Kafka, configuración y salud
+├── pipeline/         → imagen kafka-logs-pipeline        (producción)
+└── demo-producer/    → imagen kafka-logs-demo-producer   (solo dev y test)
+```
 
-Los tres roles comparten el 59% del código: cifrado, cliente de Kafka, contrato
-OTLP y el bucle de consumo. Separarlos produciría servicios de ~100-300 líneas
-colgando de una librería mayor que cualquiera de ellos, y crearía una tercera
-copia del contrato criptográfico que ya se mantiene a dos bandas con el .NET.
+| Imagen | Roles | Qué hace |
+|---|---|---|
+| `kafka-logs-pipeline` | `processor`, `sink` | Descifra, enmascara los datos personales y entrega al destino |
+| `kafka-logs-demo-producer` | — | Emite eventos con **datos ficticios** para validar el flujo |
 
-El aislamiento que importa es de ejecución, no de artefacto: cada rol es un
-Deployment con su propia identidad, sus permisos y su grupo de consumo, y el
-`sink` **no monta la llave de cifrado**.
+## Por qué el generador va en su propio artefacto
+
+El generador inventa nombres, cédulas y números de tarjeta. Si viajara en la misma
+imagen que corre en producción, bastaría una variable de entorno para que un pod
+productivo publicara **transacciones inventadas en el tópico de auditoría**, y eso
+compromete la integridad del registro.
+
+Separarlo convierte el control de *"confiamos en no desplegarlo"* a *"el código no
+está en el binario"*. Es lo que pide OWASP ASVS V14.2.2 —retirar de producción las
+funcionalidades de demostración— y lo que un auditor puede comprobar:
+
+```bash
+unzip -l pipeline/target/quarkus-app/app/*.jar | grep -ci dummy   # debe dar 0
+```
+
+Esa comprobación corre en cada build (`.github/workflows/build.yml`): si alguien
+vuelve a mezclarlos, el build falla.
+
+El módulo `core` se comparte, así que la infraestructura criptográfica no se
+duplica: mantiene un contrato byte a byte con el productor .NET y una segunda copia
+acabaría desincronizándose.
 
 ## Construir
 
 ```bash
-./mvnw test          # 36 pruebas
-./mvnw package
+./mvnw verify                                   # los tres módulos
+podman build -f pipeline/Dockerfile -t kafka-logs-pipeline .
 ```
 
-Requiere JDK 25: el proyecto aborta con un mensaje claro si se compila con una
-versión anterior.
+Requiere JDK 25: el build aborta con un mensaje claro si se usa una versión anterior.
 
 ## Contrato con el productor .NET
 
-El formato del payload cifrado, la derivación de llave (HKDF-SHA256) y los
-nombres de los atributos OTLP deben coincidir **byte a byte** con
+El formato del payload cifrado, la derivación de llave (HKDF-SHA256) y los nombres
+de los atributos OTLP deben coincidir **byte a byte** con
 [`workshop-demo-kafka-audit-producer`](https://github.com/rh-workshop/workshop-demo-kafka-audit-producer).
 Los tests congelan un vector de interoperabilidad compartido por ambos lenguajes.
 
@@ -41,4 +58,4 @@ Los tests congelan un vector de interoperabilidad compartido por ambos lenguajes
 
 Los manifiestos viven en
 [`workshop-demo-kafka-audit-pipeline-config`](https://github.com/rh-workshop/workshop-demo-kafka-audit-pipeline-config).
-Este repositorio solo produce la imagen; Argo CD no lo mira.
+Este repositorio solo produce las imágenes; Argo CD no lo mira.

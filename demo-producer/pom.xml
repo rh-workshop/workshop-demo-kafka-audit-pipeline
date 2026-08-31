@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.produbanco</groupId>
+    <artifactId>kafka-logs</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <artifactId>kafka-logs-demo-producer</artifactId>
+
+  <!-- Generador de DATOS FICTICIOS para validar el flujo. Artefacto aparte a propósito: su código no debe existir en la imagen de producción. -->
+  <dependencies>
+    <dependency><groupId>com.produbanco</groupId><artifactId>kafka-logs-core</artifactId></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-arc</artifactId></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-kafka-client</artifactId></dependency>
+    <!-- ManagedExecutor: hilos gestionados por el runtime, que sí participan del shutdown. -->
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-smallrye-context-propagation</artifactId></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-smallrye-health</artifactId></dependency>
+    <dependency><groupId>io.opentelemetry.proto</groupId><artifactId>opentelemetry-proto</artifactId></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit5</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>org.assertj</groupId><artifactId>assertj-core</artifactId><scope>test</scope></dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>${quarkus.platform.group-id}</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
