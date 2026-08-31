@@ -1,4 +1,4 @@
-# workshop-demo-log-pipeline
+# workshop-demo-kafka-audit-pipeline
 
 Servicios del pipeline de logs de auditoría sobre Kafka. Un solo artefacto Java
 (Quarkus) que asume **tres roles** según la variable de entorno `ROLE`.
@@ -34,11 +34,11 @@ versión anterior.
 
 El formato del payload cifrado, la derivación de llave (HKDF-SHA256) y los
 nombres de los atributos OTLP deben coincidir **byte a byte** con
-[`workshop-demo-log-producer`](https://github.com/rh-workshop/workshop-demo-log-producer).
+[`workshop-demo-kafka-audit-producer`](https://github.com/rh-workshop/workshop-demo-kafka-audit-producer).
 Los tests congelan un vector de interoperabilidad compartido por ambos lenguajes.
 
 ## Despliegue
 
 Los manifiestos viven en
-[`workshop-demo-log-pipeline-config`](https://github.com/rh-workshop/workshop-demo-log-pipeline-config).
+[`workshop-demo-kafka-audit-pipeline-config`](https://github.com/rh-workshop/workshop-demo-kafka-audit-pipeline-config).
 Este repositorio solo produce la imagen; Argo CD no lo mira.
