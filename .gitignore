@@ -1,0 +1,18 @@
+# Salidas de Maven
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Quarkus
+.quarkus/
+*.so
+*-runner
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
