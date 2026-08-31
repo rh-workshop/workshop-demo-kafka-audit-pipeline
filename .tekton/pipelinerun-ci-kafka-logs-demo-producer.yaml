@@ -47,7 +47,7 @@ spec:
     - name: containerfile
       value: ./demo-producer/Dockerfile
     - name: overlay-path
-      value: overlays/dev
+      value: apps/dummy-data-producer/overlays/dev
   workspaces:
     - name: source
       volumeClaimTemplate:

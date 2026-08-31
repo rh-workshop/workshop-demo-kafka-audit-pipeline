@@ -47,7 +47,7 @@ spec:
     - name: containerfile
       value: ./pipeline/Dockerfile
     - name: overlay-path
-      value: overlays/dev
+      value: apps/log-processor/overlays/dev
   workspaces:
     - name: source
       volumeClaimTemplate:

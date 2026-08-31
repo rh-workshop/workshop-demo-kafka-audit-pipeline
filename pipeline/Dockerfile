@@ -15,6 +15,15 @@ RUN mvn -B -DskipTests dependency:go-offline
 COPY core/src core/src
 COPY pipeline/src pipeline/src
 RUN mvn -B -DskipTests -pl pipeline -am clean package
+# Control de auditoría: la imagen de producción no puede contener el generador de datos ficticios.
+# El aislamiento ya es estructural (arriba no se copia demo-producer/src y el módulo 'pipeline' no
+# depende de él), pero eso se puede deshacer con un cambio de una línea en un pom. Verificarlo aquí
+# convierte la garantía en algo comprobado en cada build, y falla el CI en vez de una revisión.
+# Se lista con 'jar tf' y no con unzip: unzip no está garantizado en la UBI (esta misma imagen
+# tampoco trae gzip), mientras que jar viene con el JDK que ya se está usando para compilar.
+RUN if jar tf pipeline/target/quarkus-app/app/*.jar | grep -i dummy; then \
+      echo "ERROR: el artefacto de producción contiene clases de datos ficticios" && exit 1; \
+    fi && echo "OK: el artefacto de producción no contiene código de datos ficticios"
 
 # Etapa runtime: solo el JRE UBI y el fast-jar de este módulo.
 FROM registry.access.redhat.com/ubi9/openjdk-25-runtime:1.24
