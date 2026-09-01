@@ -50,7 +50,11 @@ public class PipelineApp {
     }
 
     void onStart(@Observes StartupEvent event) {
-        Role role = Role.from(config.role());
+        // La configuración es compartida con el generador de datos ficticios, que no tiene rol, así
+        // que ROLE es opcional allí. Aquí es obligatorio: sin él no se sabe qué bucle arrancar.
+        Role role = Role.from(config.role()
+                .orElseThrow(() -> new IllegalStateException(
+                        "falta la variable ROLE; se esperaba 'processor' o 'sink'")));
         runner = switch (role) {
             case PROCESSOR -> processor.get();
             case SINK -> sink.get();

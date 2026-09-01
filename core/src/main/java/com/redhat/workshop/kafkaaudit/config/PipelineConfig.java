@@ -12,9 +12,14 @@ import io.smallrye.config.WithName;
 @ConfigMapping(prefix = "pipeline")
 public interface PipelineConfig {
 
-    /// Rol que asume esta instancia: producer, processor o sink.
+    /// Rol que asume esta instancia: processor o sink.
+    ///
+    /// Opcional porque esta configuración la comparten los dos artefactos, y el generador de datos
+    /// ficticios no tiene roles: hace una sola cosa. Declararlo obligatorio lo dejaba en
+    /// CrashLoopBackOff nada más arrancar. Quien SÍ necesita el rol es `PipelineApp`, que aborta
+    /// con un mensaje explícito si falta (ver `Role.from`).
     @WithName("ROLE")
-    String role();
+    Optional<String> role();
 
     @WithName("BOOTSTRAP")
     String bootstrap();
